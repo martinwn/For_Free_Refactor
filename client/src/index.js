@@ -1,8 +1,42 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import { injectGlobal } from "styled-components";
 import App from "./App";
+import IntroPage from "./components/Pages/IntroPage/IntroPage";
 import registerServiceWorker from "./registerServiceWorker";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+injectGlobal`
+
+  html {
+    height: 100%;
+    font-size: 16px;
+  }
+
+  body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: 'Ubuntu', sans-serif;
+  }
+
+  #root {
+    height: 100%;
+  }
+
+  &:focus {
+    outline: none !important;
+  }
+
+`;
+
+ReactDOM.render(
+  <Router>
+    <React.Fragment>
+      <Route path="/" component={App} />
+      <Route exact path="/login" component={IntroPage} />
+    </React.Fragment>
+  </Router>,
+  document.getElementById("root")
+);
 registerServiceWorker();
