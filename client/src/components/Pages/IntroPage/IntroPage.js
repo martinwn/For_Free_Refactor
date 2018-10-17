@@ -175,18 +175,11 @@ class IntroPage extends Component {
           <IntroWrapper>
             <IntroSection>
               <IntroHeader>One's Trash is Another's Treasure</IntroHeader>
+              <IntroBlurb>See what's for free in your neighborhood.</IntroBlurb>
               <IntroBlurb>
-                <img alt="icon" /> See what's for free in your neighborhood.
+                Want to get rid of something but don't want it to go to waste?
               </IntroBlurb>
-              <IntroBlurb>
-                {" "}
-                <img alt="icon" /> Want to get rid of something but don't want
-                it to go to waste?
-              </IntroBlurb>
-              <IntroBlurb>
-                {" "}
-                <img alt="icon" /> We help people connect so everybody wins.
-              </IntroBlurb>
+              <IntroBlurb>We help people connect so everybody wins.</IntroBlurb>
             </IntroSection>
           </IntroWrapper>
           <LoginRegisterWrapper>

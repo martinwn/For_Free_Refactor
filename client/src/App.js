@@ -6,6 +6,7 @@ import HomePage from "./components/Pages/HomePage/HomePage";
 import AuthService from "./components/AuthService/AuthService";
 import WithAuth from "./components/WithAuth/WithAuth";
 import Theme from "./components/Theme/Theme";
+import API from "./utils/API";
 const Auth = new AuthService();
 
 class App extends Component {
@@ -53,7 +54,7 @@ class App extends Component {
       "video gaming",
       "wheels/tires"
     ],
-    checked: [0],
+    checked: [],
     spacing: 32
   };
 
@@ -68,15 +69,59 @@ class App extends Component {
       newChecked.splice(currentIndex, 1);
     }
 
-    this.setState({
-      checked: newChecked
-    });
+    this.setState(
+      {
+        checked: newChecked
+      },
+      () => {
+        console.log("works");
+        const query = {
+          latitude: this.props.user.location.coords.latitude,
+          longitude: this.props.user.location.coords.longitude,
+          categories: this.state.checked
+        };
+
+        // for (let i = 1; i < this.state.checked.length; i++) {
+        //   const newObject = new Object();
+        //   newObject.category = this.state.checked[i];
+        //   query.categories.$and.push(newObject);
+        // }
+        this.handleCategorySearch(query);
+      }
+    );
   };
+
+  handleCategorySearch(query) {
+    API.getPostsByCategory(query).then(response => {});
+  }
 
   handleLogout = () => {
     Auth.logout();
     this.props.history.replace("/login");
     window.location.reload();
+  };
+
+  handleUserPostConnect = (targetUser, title) => {
+    const query = {
+      user_id: targetUser,
+      email: this.props.user.email,
+      title: title
+    };
+    API.connectUserPost(query)
+      .then(response => console.log(response))
+      .catch(error => console.log(error));
+  };
+
+  handleDeletePost = id => {
+    API.deletePost(id)
+      .then(response => window.location.reload())
+      .catch(error => window.location.reload());
+  };
+
+  handleDeleteNotification = id => {
+    API.deleteNotification(id)
+      .then(response => window.location.reload())
+      .catch(error => console.log(error));
   };
 
   render() {
@@ -91,11 +136,11 @@ class App extends Component {
               <HomePage
                 {...props}
                 user={user}
+                posts={this.state.posts}
                 handleLogout={this.handleLogout}
                 spacing={this.state.spacing}
                 categories={this.state.categories}
-                checked={this.state.checked}
-                handleToggle={this.handleToggle}
+                handleUserPostConnect={this.handleUserPostConnect}
               />
             )}
           />
@@ -108,6 +153,7 @@ class App extends Component {
                 user={user}
                 handleLogout={this.handleLogout}
                 spacing={this.state.spacing}
+                categories={this.state.categories}
               />
             )}
           />
@@ -118,8 +164,10 @@ class App extends Component {
               <ProfilePage
                 {...props}
                 user={user}
+                handleDeletePost={this.handleDeletePost}
                 handleLogout={this.handleLogout}
                 spacing={this.state.spacing}
+                handleDeleteNotification={this.handleDeleteNotification}
               />
             )}
           />

@@ -16,6 +16,7 @@ const DropZone = ({ handleDrop, uploadedImage }) => {
         <img
           className={!uploadedImage ? "hide" : ""}
           src={uploadedImage ? uploadedImage.preview : ""}
+          alt="item"
         />
       </Dropzone>
     </div>

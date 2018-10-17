@@ -19,7 +19,19 @@ const UserSchema = new Schema(
     updatedAt: {
       type: Number,
       required: false
-    }
+    },
+    posts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Post"
+      }
+    ],
+    notifications: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Notification"
+      }
+    ]
   },
   { runSettersOnQuery: true }
 );
@@ -44,10 +56,8 @@ UserSchema.pre("save", function(next) {
   }
 
   if (!this.password) {
-    console.log("models/user.js =======NO PASSWORD PROVIDED=======");
     next();
   } else {
-    console.log("models/user.js hashPassword in pre save");
     this.password = this.hashPassword(this.password);
     next();
   }

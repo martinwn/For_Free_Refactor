@@ -28,6 +28,10 @@ injectGlobal`
     outline: none !important;
   }
 
+  a {
+    text-decoration: none
+  }
+
 `;
 
 ReactDOM.render(

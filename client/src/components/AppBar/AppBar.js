@@ -4,7 +4,6 @@ import styled from "styled-components";
 import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
 import CreateIcon from "@material-ui/icons/Create";
 import ExitIcon from "@material-ui/icons/ExitToApp";
 import HomeIcon from "@material-ui/icons/Home";
@@ -103,9 +102,7 @@ class AppBar extends Component {
             </Link>
             <Link to="/profile">
               <IconButton>
-                <Badge badgeContent={4}>
-                  <AccountCircle nativeColor="black" />
-                </Badge>
+                <AccountCircle nativeColor="black" />
               </IconButton>
             </Link>
             <IconButton onClick={this.props.handleLogout}>

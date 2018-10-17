@@ -10,7 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
 import Textarea from "react-textarea-autosize";
-import DropZone from "../DropZone/DropZone";
+import DropZone from "./DropZone/DropZone";
+import DropDown from "./DropDown/DropDown";
 
 const TitleInput = styled.input`
   font-family: Ubuntu, sans-serif;
@@ -72,7 +73,9 @@ class FullWidthTabs extends React.Component {
       handlePostReset,
       handlePostSubmit,
       description,
-      title
+      title,
+      categories,
+      category
     } = this.props;
     return (
       <div className={classes.root}>
@@ -94,6 +97,12 @@ class FullWidthTabs extends React.Component {
           onChangeIndex={this.handleChangeIndex}
         >
           <TabContainer dir={theme.direction}>
+            <DropDown
+              category={category}
+              handleChange={handleChange}
+              categories={categories}
+            />
+
             <TitleInput
               placeholder="Enter Title"
               name="title"
@@ -117,7 +126,7 @@ class FullWidthTabs extends React.Component {
             variant="outlined"
             color="primary"
             className={classes.button}
-            disabled={!uploadedImage || !title || !description}
+            disabled={!uploadedImage || !title || !category}
             onClick={handlePostSubmit}
           >
             Submit
@@ -126,7 +135,7 @@ class FullWidthTabs extends React.Component {
             variant="outlined"
             color="primary"
             className={classes.button}
-            disabled={!uploadedImage && !title && !description}
+            disabled={!uploadedImage && !title && !description && !category}
             onClick={handlePostReset}
           >
             Reset

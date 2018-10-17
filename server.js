@@ -15,9 +15,11 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(formData.parse());
+// Env variables
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").load();
 }
+// Cross-browser origin access
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.setHeader(
@@ -52,12 +54,10 @@ mongoose.connect(
   }
 );
 
-// Serve up static assets (usually on heroku)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 }
 
-// Define API routes here
 app.post("/register", (req, res) => {
   db.User.create(req.body)
     .then(response => {
@@ -75,49 +75,151 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
-  db.User.findOne({ email: email }).then(user => {
-    console.log(user);
-    if (user.checkPassword(password)) {
-      //If all credentials are correct do thiss
-      let token = jwt.sign(
-        { id: user.id, email: user.email },
-        process.env.SECRET,
-        { expiresIn: 129600 }
-      ); // Sigining the token
-      res.json({
-        success: true,
-        err: null,
-        token
-      });
-      return;
-    } else {
-      res.status(401).json({
-        success: false,
-        token: null,
-        err: "email or password is incorrect"
-      });
-    }
-  });
+  db.User.findOne({ email: email })
+    .then(user => {
+      if (user.checkPassword(password)) {
+        //If all credentials are correct do thiss
+        let token = jwt.sign(
+          { id: user.id, email: user.email },
+          process.env.SECRET,
+          { expiresIn: 129600 }
+        ); // Sigining the token
+        res.json({
+          success: true,
+          err: null,
+          token
+        });
+        return;
+      } else {
+        res.status(401).json({
+          success: false,
+          token: null,
+          err: "email or password is incorrect"
+        });
+      }
+    })
+    .catch(error => {
+      res.status(401).send(error);
+    });
 });
 
 app.post("/upload", (req, res) => {
-  console.log(req.files.image.path);
   cloudinary.v2.uploader
-    .upload(
-      req.files.image.path
-      // {
-      //   eager: [{ width: 400, crop: "scale" }]
-    )
+    .upload(req.files.image.path, {
+      eager: [{ width: 400, crop: "fit" }]
+    })
     .then(response => {
-      res.json(response);
+      res.json(response.secure_url);
     })
     .catch(error => {
       res.send(error);
     });
 });
 
-// Send every other request to the React app
-// Define any API routes before this runs
+app.post("/post", (req, res) => {
+  db.Post.create(req.body)
+    .then(function(dbPost) {
+      db.User.findOneAndUpdate(
+        {
+          _id: req.body.user_id
+        },
+        {
+          $push: { posts: dbPost._id }
+        },
+        { upsert: true }
+      )
+        .then(response => res.status(201).send(response))
+        .catch(error => res.status(500).send(error));
+    })
+    .catch(error => res.status(500).send(error));
+});
+
+app.get("/post", (req, res) => {
+  const { latitude, longitude, categories, offset } = req.query;
+  let postArray = [];
+  if (categories) {
+    db.Post.find({ category: { $in: [...categories] } })
+      .sort({ createdAt: -1 })
+      .skip(Number(offset))
+      .limit(5)
+      .then(post => {
+        post.forEach(function(element) {
+          if (element.checkInRadius(latitude, longitude)) {
+            postArray.push(element);
+          }
+        });
+      })
+      .then(function() {
+        res.json(postArray);
+      })
+      .catch(error => res.status(500).send(error));
+  } else {
+    console.log(offset);
+
+    db.Post.find()
+      .sort({ createdAt: -1 })
+      .skip(Number(offset))
+      .limit(5)
+      .then(post => {
+        post.forEach(function(element) {
+          if (element.checkInRadius(latitude, longitude)) {
+            postArray.push(element);
+          }
+        });
+      })
+      .then(function() {
+        res.json(postArray);
+      })
+      .catch(error => res.send(error));
+  }
+});
+
+app.delete("/post", (req, res) => {
+  console.log(req.query.id);
+  db.Post.deleteOne({ _id: req.query.id })
+    .then(post => res.status(202).send(response))
+    .catch(error => res.status(500).send(error));
+});
+
+app.delete("/notification", (req, res) => {
+  console.log(req.query.id);
+  db.Notification.deleteOne({ _id: req.query.id })
+    .then(response => res.status(202).send(response))
+    .catch(error => console.log(error));
+});
+
+app.post("/notification", (req, res) => {
+  db.Notification.create(req.body)
+    .then(function(dbNotification) {
+      db.User.findOneAndUpdate(
+        { _id: req.body.user_id },
+        {
+          $push: { notifications: dbNotification._id }
+        },
+        { upsert: true }
+      )
+        .then(response => res.status(201).send(response))
+        .catch(error => res.status(500).send(error));
+    })
+    .catch(error => res.status(500).send(error));
+});
+
+app.get("/profile", (req, res) => {
+  db.User.findOne({ _id: req.query.id })
+    .populate({ path: "posts", options: { sort: { createdAt: "descending" } } })
+    .populate({
+      path: "notifications",
+      options: { sort: { createdAt: "descending" } }
+    })
+    .then(profile => {
+      const profileInfo = {
+        posts: profile.posts,
+        notifications: profile.notifications
+      };
+      res.json(profileInfo);
+    })
+    .catch(error => res.status(500).send(error));
+});
 
 app.get("*", jwtMW, (req, res) => {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));

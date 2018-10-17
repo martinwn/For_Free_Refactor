@@ -39,11 +39,10 @@ export default function WithAuth(AuthComponent) {
       } else {
         try {
           const profile = Auth.getProfile();
-
           geolocator.locate(options, (error, location) => {
             if (error) return console.log(error);
             profile.location = location;
-
+            console.log(profile);
             this.setState({
               user: profile
             });

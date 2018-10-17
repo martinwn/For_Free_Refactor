@@ -25,7 +25,8 @@ class PostPage extends Component {
   state = {
     title: "",
     description: "",
-    uploadedImage: null
+    uploadedImage: null,
+    category: ""
   };
 
   handleDrop = files => {
@@ -37,12 +38,15 @@ class PostPage extends Component {
   handleImageUpload = (imageFile, cb) => {
     API.uploadImage(imageFile)
       .then(response => {
-        cb(response);
+        cb(response.data);
       })
       .catch(error => console.log(error));
   };
 
   handleChange = e => {
+    if (e.label) {
+      return this.setState({ category: e });
+    }
     const { name, value } = e.target;
     this.setState({
       [name]: value
@@ -53,7 +57,8 @@ class PostPage extends Component {
     this.setState({
       uploadedImage: null,
       title: "",
-      description: ""
+      description: "",
+      category: null
     });
   };
 
@@ -62,7 +67,26 @@ class PostPage extends Component {
   };
 
   handlePostSubmit = () => {
-    this.handleImageUpload(this.state.uploadedImage);
+    this.handleImageUpload(this.state.uploadedImage, response => {
+      const address = `${this.props.user.location.address.city}, ${this.props
+        .user.location.address.state ||
+        this.props.user.location.address.country}`;
+
+      let query = {
+        title: this.state.title,
+        description: this.state.description,
+        image_url: response,
+        latitude: this.props.user.location.coords.latitude,
+        longitude: this.props.user.location.coords.longitude,
+        address: address,
+        user_id: this.props.user.id,
+        category: this.state.category.value
+      };
+
+      API.createPost(query)
+        .then(response => this.props.history.replace("/"))
+        .catch(error => console.log(error));
+    });
   };
 
   render() {
@@ -70,7 +94,11 @@ class PostPage extends Component {
       <PageWrapper>
         <AppBar handleLogout={this.props.handleLogout} currentPage="Post" />
         <ContentWrapper>
-          <Grid container spacing={this.props.spacing}>
+          <Grid
+            container
+            spacing={this.props.spacing}
+            style={{ display: "flex", justifyContent: "center" }}
+          >
             <Grid item xs={8}>
               <PostTitle>Create Post</PostTitle>
               <PostForm
@@ -82,9 +110,10 @@ class PostPage extends Component {
                 handlePostSubmit={this.handlePostSubmit}
                 description={this.state.description}
                 title={this.state.title}
+                categories={this.props.categories}
+                category={this.state.category}
               />
             </Grid>
-            <Grid item xs={4} />
           </Grid>
         </ContentWrapper>
       </PageWrapper>
