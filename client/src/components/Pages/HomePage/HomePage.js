@@ -18,23 +18,24 @@ const ContentWrapper = styled.div`
 `;
 
 class HomePage extends Component {
-  constructor(props) {
-    super(props);
-    window.onscroll = () => {
-      if (
-        Math.round(window.innerHeight) + Math.round(window.scrollY) ===
-        Math.round(document.getElementById("Homepage").offsetHeight - 1)
-      ) {
-        return this.loadMore();
-      }
-    };
-  }
-
   state = {
     posts: null,
     checked: [],
     offset: 0
   };
+
+  componentDidMount() {
+    window.onscroll = () => {
+      if (document.getElementById("homepage")) {
+        if (
+          Math.round(window.innerHeight) + Math.round(window.scrollY) ===
+          Math.round(document.getElementById("homepage").offsetHeight - 1)
+        ) {
+          return this.loadMore();
+        }
+      }
+    };
+  }
 
   handleToggle = value => {
     const { checked } = this.state;
@@ -102,7 +103,7 @@ class HomePage extends Component {
     } = this.props;
 
     return (
-      <PageWrapper id="Homepage">
+      <PageWrapper id="homepage">
         <AppBar handleLogout={handleLogout} currentPage="Home" />
         <ContentWrapper>
           <Grid

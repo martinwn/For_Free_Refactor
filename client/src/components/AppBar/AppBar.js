@@ -91,8 +91,8 @@ class AppBar extends Component {
             <CurrentPage>{this.props.currentPage}</CurrentPage>
           </NavComponent>
           <NavComponent>
-            <SearchIcon style={{ padding: "0 10px" }} />
-            <Input placeholder="Search For Free" />
+            {/* <SearchIcon style={{ padding: "0 10px" }} />
+            <Input placeholder="Search For Free" /> */}
           </NavComponent>
           <NavComponent>
             <Link to="/post">

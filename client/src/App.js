@@ -74,18 +74,11 @@ class App extends Component {
         checked: newChecked
       },
       () => {
-        console.log("works");
         const query = {
           latitude: this.props.user.location.coords.latitude,
           longitude: this.props.user.location.coords.longitude,
           categories: this.state.checked
         };
-
-        // for (let i = 1; i < this.state.checked.length; i++) {
-        //   const newObject = new Object();
-        //   newObject.category = this.state.checked[i];
-        //   query.categories.$and.push(newObject);
-        // }
         this.handleCategorySearch(query);
       }
     );
@@ -108,7 +101,7 @@ class App extends Component {
       title: title
     };
     API.connectUserPost(query)
-      .then(response => console.log(response))
+      .then(response => this.setState({ postConnectionSent: true }))
       .catch(error => console.log(error));
   };
 

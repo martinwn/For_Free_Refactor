@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
@@ -24,48 +24,61 @@ const styles = {
   }
 };
 
-function MediaCard(props) {
-  const {
-    classes,
-    title,
-    description,
-    image,
-    address,
-    id,
-    date,
-    category,
-    targetUser,
-    handleUserPostConnect
-  } = props;
-  return (
-    <Card id={id} className={classes.card}>
-      <CardActionArea>
-        <CardMedia className={classes.media} image={image} />
-        <CardContent style={{ textAlign: "center" }}>
-          <Typography gutterBottom variant="h5" component="h2">
-            {title}
-          </Typography>
-          <Typography component="p">{description}</Typography>
-          <Typography component="p">
-            {address} {moment(date).fromNow()}
-          </Typography>
-          <Typography component="p">{category}</Typography>
-        </CardContent>
-      </CardActionArea>
-      <CardActions style={{ display: "flex", justifyContent: "center" }}>
-        <Button
-          size="small"
-          onClick={() => handleUserPostConnect(targetUser, title)}
-          color="primary"
-        >
-          Connect
-        </Button>
-        {/* <Button size="small" color="primary">
+class MediaCard extends Component {
+  state = {
+    postConnectionSent: false
+  };
+  render() {
+    const {
+      classes,
+      title,
+      description,
+      image,
+      address,
+      id,
+      date,
+      category,
+      targetUser,
+      handleUserPostConnect
+    } = this.props;
+    return (
+      <Card id={id} className={classes.card}>
+        <CardActionArea>
+          <CardMedia className={classes.media} image={image} />
+          <CardContent style={{ textAlign: "center" }}>
+            <Typography gutterBottom variant="h5" component="h2">
+              {title}
+            </Typography>
+            <Typography component="p">{description}</Typography>
+            <Typography component="p">
+              {address} {moment(date).fromNow()}
+            </Typography>
+            <Typography component="p">{category}</Typography>
+          </CardContent>
+        </CardActionArea>
+        <CardActions style={{ display: "flex", justifyContent: "center" }}>
+          {!this.state.postConnectionSent ? (
+            <Button
+              size="small"
+              onClick={() => {
+                handleUserPostConnect(targetUser, title);
+                this.setState({ postConnectionSent: true });
+              }}
+              color="primary"
+            >
+              Connect
+            </Button>
+          ) : (
+            <h3>Connection Sent</h3>
+          )}
+
+          {/* <Button size="small" color="primary">
           Learn More
         </Button> */}
-      </CardActions>
-    </Card>
-  );
+        </CardActions>
+      </Card>
+    );
+  }
 }
 
 MediaCard.propTypes = {

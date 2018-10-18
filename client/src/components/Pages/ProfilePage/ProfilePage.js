@@ -26,7 +26,6 @@ class ProfilePage extends Component {
   componentWillMount() {
     API.getUserProfile(this.props.user.id)
       .then(response => {
-        console.log(response.data);
         this.setState({
           posts: response.data.posts,
           notifications: response.data.notifications
@@ -42,7 +41,6 @@ class ProfilePage extends Component {
       handleDeletePost,
       handleDeleteNotification
     } = this.props;
-    console.log(handleDeleteNotification);
     return (
       <PageWrapper>
         <AppBar handleLogout={handleLogout} currentPage="Profile" />
@@ -59,6 +57,7 @@ class ProfilePage extends Component {
               }}
             >
               <h1>My Posts</h1>
+
               {!this.state.posts ? (
                 <h3>Loading</h3>
               ) : (
